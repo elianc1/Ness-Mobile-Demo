@@ -843,7 +843,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 
 .notes-strip-section{margin-top:1.25rem;}
 .notes-strip{display:flex;gap:0.75rem;overflow-x:auto;padding-bottom:0.25rem;-webkit-overflow-scrolling:touch;}
-.notes-strip-card{flex:0 0 auto;width:9.5rem;min-height:6rem;border-radius:0.75rem;padding:0.75rem 0.875rem;font-size:0.8125rem;font-weight:600;line-height:1.35;color:#242424;box-shadow:0 0.375rem 0.875rem -0.375rem rgba(0,0,0,.4);cursor:pointer;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;transition:transform .15s;}
+.notes-strip-card{flex:0 0 auto;width:9.5rem;min-height:6rem;border-radius:0.75rem;padding:0.75rem 0.875rem;font-size:0.8125rem;font-weight:600;line-height:1.35;color:#242424;box-shadow:0 0.375rem 0.875rem -0.375rem rgba(0,0,0,.4);cursor:pointer;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;transition:transform .15s;}
 .notes-strip-card:active{transform:scale(.96);}
 .notes-strip-empty{font-size:0.75rem;color:var(--text-dimmer);padding:0.75rem 0;}
 
@@ -941,6 +941,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .fab{position:fixed;right:1.25rem;bottom:calc(5.25rem + env(safe-area-inset-bottom,0));width:3.5rem;height:3.5rem;padding:0;border:none;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0.5rem 1.25rem -0.25rem rgba(124,140,255,.65), inset 0 1px 0 rgba(255,255,255,.3);z-index:5;transition:transform .15s;}
 .fab svg{width:1.625rem;height:1.625rem;}
 .fab:active{transform:scale(.92);}
+
+/* ---- Real viewport height: --app-vh is measured in JS from window.innerHeight /
+   visualViewport.height (ground truth) and overrides the CSS-only inset:0 sizing,
+   which left a strip of .bezel's own black background exposed below the tab bar
+   on some iOS devices, especially right after "Add to Home Screen" launch. ---- */
+.bezel{height:var(--app-vh, 100dvh);}
+
+/* ---- App header: was translucent enough (rgba(10,10,12,.4) + blur) that the
+   Home screen's arm-state color wash bled straight through it, reading as an
+   uneven gradient across the top bar instead of a clean, solid bar. Nearly
+   opaque now so it always reads as one flat surface regardless of what's
+   glowing behind it. ---- */
+.app-header{background:rgba(9,10,13,.94);}
 </style>
 </head>
 <body>
@@ -1357,6 +1370,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 
 <script>
 /* ============================================================
+   REAL VIEWPORT HEIGHT — iOS standalone home-screen apps (and
+   Safari tabs) can report 100vh/100dvh a little short of the
+   true visible height right at launch, which left a black strip
+   of the .bezel's own background showing below the tab bar on
+   some devices. window.innerHeight / visualViewport.height are
+   ground truth, so measure them directly and drive .bezel's
+   height from a CSS variable instead of trusting vh/dvh alone.
+   ============================================================ */
+function syncViewportHeight(){
+  const h = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+  document.documentElement.style.setProperty("--app-vh", h + "px");
+}
+syncViewportHeight();
+window.addEventListener("resize", syncViewportHeight);
+window.addEventListener("orientationchange", ()=>setTimeout(syncViewportHeight, 60));
+if(window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
+
+/* ============================================================
    AEGIS ALARM PANEL — DEMO LOGIC
    ============================================================ */
 const PIN = "1234";
@@ -1618,7 +1649,7 @@ function paintAppChrome(){
 function renderNotesStrip(){
   const box = document.getElementById("notesStrip");
   if(!box) return;
-  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${escapeHtml(n.text)}</div>`).join("")
+  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${truncateNote(n.text,70)}</div>`).join("")
     || `<div class="notes-strip-empty">No notes yet — add one from the Notes tab.</div>`;
 }
 document.getElementById("notesStrip").addEventListener("click", ()=>switchView("notes"));
@@ -2269,6 +2300,16 @@ function renderNotes(){
   lucide.createIcons();
 }
 function escapeHtml(s){ return s.replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+// Truncates on a word boundary (never mid-word) and only appends "…" when the
+// text actually needed cutting — used for any note preview shorter than the
+// full text (notes strip, mini notes) so the ellipsis always lands cleanly.
+function truncateNote(text, maxLen){
+  if(text.length <= maxLen) return escapeHtml(text);
+  const cut = text.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  const safe = lastSpace > maxLen * 0.4 ? cut.slice(0, lastSpace) : cut;
+  return escapeHtml(safe) + "…";
+}
 document.getElementById("notesBoard").addEventListener("click", e=>{
   const act = e.target.closest("[data-action]");
   if(act){
@@ -2347,7 +2388,7 @@ function renderMiniNotes(){
   const box = document.getElementById("miniNotes");
   // Every note gets a square, scrolled horizontally — nothing is capped
   // to "the first N" any more, since scrolling is how they're all reached.
-  box.innerHTML = state.notes.map(n=>`<div class="mini-note" data-id="${n.id}" style="background:${n.color}">${escapeHtml(n.text.slice(0,60))}${n.text.length>60?'…':''}</div>`).join("")
+  box.innerHTML = state.notes.map(n=>`<div class="mini-note" data-id="${n.id}" style="background:${n.color}">${truncateNote(n.text,60)}</div>`).join("")
     || `<div style="color:var(--text-dimmer);font-size:0.75rem;display:flex;align-items:center;">No notes yet</div>`;
   renderNotesStrip();
 }
