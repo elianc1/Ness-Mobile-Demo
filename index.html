@@ -818,7 +818,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 
 .tab-bar{
   flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;
-  padding:0.125rem 0.375rem calc(0.125rem + env(safe-area-inset-bottom,0));
+  padding:0.5rem 0.375rem calc(0.4375rem + env(safe-area-inset-bottom,0));
   background:#0a0b0e;
   border-top:1px solid var(--border);
 }
@@ -916,17 +916,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 #view-home .notes-strip-section{margin-top:0.875rem;}
 
 /* ---- Status hero: a soft glowing badge that mirrors the live arm state (color set inline via JS from the same MODE_META used everywhere else); no explanatory subtext — the color and icon already say what's needed ---- */
-.status-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;padding:0 0 0.875rem;text-align:center;color:var(--green);}
-.status-hero-icon{position:relative;width:4rem;height:4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.14),rgba(255,255,255,.02));border:1px solid var(--border);box-shadow:0 0 2.25rem -0.5rem currentColor, inset 0 1px 0 rgba(255,255,255,.16);transition:color .3s;}
+.status-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.625rem;padding:0 0 0.875rem;text-align:center;color:var(--green);}
+.status-hero-icon{position:relative;width:5.25rem;height:5.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.14),rgba(255,255,255,.02));border:1px solid var(--border);box-shadow:0 0 2.25rem -0.5rem currentColor, inset 0 1px 0 rgba(255,255,255,.16);transition:color .3s;}
 .status-hero-icon::after{content:"";position:absolute;inset:-0.375rem;border-radius:50%;border:1px solid currentColor;opacity:.28;}
-.status-hero-icon svg{width:1.875rem;height:1.875rem;color:currentColor;}
-.status-hero-label{font-size:1.125rem;font-weight:800;letter-spacing:.2px;color:var(--text);}
+.status-hero-icon svg{width:2.375rem;height:2.375rem;color:currentColor;}
+.status-hero-label{font-size:1.25rem;font-weight:800;letter-spacing:.2px;color:var(--text);}
 
 /* ---- Home tiles v2: a permanent semantic tint per action so the grid reads at a glance even before anything is armed (a more "modern app" cue than the old flat gray icon tiles); label only, no secondary state line ---- */
-.app-tiles-grid{gap:0.625rem;}
-.app-tiles-grid .tile{min-height:5.25rem;padding:0.875rem 0.75rem;border-radius:1.125rem;}
-.app-tiles-grid .tile .tile-icon{width:2.75rem;height:2.75rem;border-radius:50%;}
-.app-tiles-grid .tile .tile-icon svg{width:1.25rem;height:1.25rem;}
+.app-tiles-grid{gap:0.75rem;}
+.app-tiles-grid .tile{min-height:6.75rem;padding:1.125rem 0.75rem;border-radius:1.125rem;}
+.app-tiles-grid .tile .tile-icon{width:3rem;height:3rem;border-radius:50%;}
+.app-tiles-grid .tile .tile-icon svg{width:1.375rem;height:1.375rem;}
 .app-tiles-grid .tile.dim{opacity:.4;}
 .app-tiles-grid .tile span.label{font-size:0.8125rem;font-weight:700;}
 .app-tiles-grid .tile[data-app-tile="away"] .tile-icon{color:var(--red);background:rgba(251,79,92,.12);}
@@ -955,7 +955,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
    uneven gradient across the top bar instead of a clean, solid bar. Nearly
    opaque now so it always reads as one flat surface regardless of what's
    glowing behind it. ---- */
-.app-header{background:#0a0b0e;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.app-header{background:#0a0b0e;backdrop-filter:none;-webkit-backdrop-filter:none;position:relative;z-index:3;isolation:isolate;}
 </style>
 </head>
 <body>
