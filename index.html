@@ -817,14 +817,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .ah-status .ah-dot.show{display:block;}
 
 .tab-bar{
-  flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-around;
-  padding:0.5rem 0.375rem calc(0.5rem + env(safe-area-inset-bottom,0));
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;
+  padding:0.25rem 0.375rem calc(0.25rem + env(safe-area-inset-bottom,0));
   background:rgba(8,8,10,.42);backdrop-filter:blur(1.25rem) saturate(160%);
   border-top:1px solid var(--border);
 }
 .tab-bar .nav-item{
-  width:auto;height:auto;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;
-  padding:0.375rem 0.125rem;border-radius:0.75rem;color:var(--text-dim);background:transparent;box-shadow:none;
+  width:auto;height:auto;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0.25rem 0.125rem;border-radius:0.625rem;color:var(--text-dim);background:transparent;box-shadow:none;
 }
 .tab-bar .nav-item svg{width:1.1875rem;height:1.1875rem;}
 .tab-bar .nav-item span{font-size:0.5625rem;font-weight:700;letter-spacing:.2px;}
@@ -843,7 +843,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 
 .notes-strip-section{margin-top:1.25rem;}
 .notes-strip{display:flex;gap:0.75rem;overflow-x:auto;padding-bottom:0.25rem;-webkit-overflow-scrolling:touch;}
-.notes-strip-card{flex:0 0 auto;width:9.5rem;min-height:6rem;border-radius:0.75rem;padding:0.75rem 0.875rem;font-size:0.8125rem;font-weight:600;line-height:1.35;color:#242424;box-shadow:0 0.375rem 0.875rem -0.375rem rgba(0,0,0,.4);cursor:pointer;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;transition:transform .15s;}
+.notes-strip-card{flex:0 0 auto;width:9rem;min-height:4.5rem;border-radius:0.75rem;padding:0.625rem 0.75rem;font-size:0.75rem;font-weight:600;line-height:1.3;color:#242424;box-shadow:0 0.375rem 0.875rem -0.375rem rgba(0,0,0,.4);cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:transform .15s;}
 .notes-strip-card:active{transform:scale(.96);}
 .notes-strip-empty{font-size:0.75rem;color:var(--text-dimmer);padding:0.75rem 0;}
 
@@ -897,7 +897,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 #view-security .sec-main,#view-security .sec-side{min-height:auto;}
 
 /* ---- Toast now needs to clear the bottom tab bar instead of floating over the (now-hidden) kiosk-only bottom edge ---- */
-.toast{bottom:calc(5.5rem + env(safe-area-inset-bottom,0));}
+.toast{bottom:calc(4rem + env(safe-area-inset-bottom,0));}
 
 /* ---- Home v2: greeting stays pinned to the top; a flexible spacer pushes
    the status hero and the quick-action grid down toward the thumb-friendly
@@ -905,28 +905,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
    top-loaded panel page, with the notes strip anchored below the buttons.
    Only the spacer stretches (flex:1 1 auto) — every real content block
    keeps flex:0 0 auto so it can never be crushed the way the old
-   fixed-height sec-layout was. #view-home already has a definite height
-   (inset:0 on .view), so the spacer has real room to grow; if content ever
-   exceeds that height it just scrolls, same as before. ---- */
-#view-home.view{display:flex;flex-direction:column;overflow-y:auto;background-color:transparent;}
-#view-home .view-header,#view-home .notes-strip-section,#view-home .status-hero,#view-home .app-tiles-grid{flex:0 0 auto;}
-#view-home .home-spacer{flex:1 1 auto;min-height:0.75rem;}
-#view-home .notes-strip-section{margin-top:1.5rem;}
+   fixed-height sec-layout was. The whole screen is sized to fit within one
+   view with no scrolling (overflow:hidden, not auto) — sizes below are
+   tuned to leave headroom under a typical phone's header+tab-bar chrome
+   rather than exactly maxing it out, so the fit holds across device sizes. ---- */
+#view-home.view{display:flex;flex-direction:column;overflow:hidden;background-color:transparent;padding-top:0.875rem;padding-bottom:0.75rem;}
+#view-home .view-header{flex:0 0 auto;margin-bottom:0.5rem;}
+#view-home .notes-strip-section,#view-home .status-hero,#view-home .app-tiles-grid{flex:0 0 auto;}
+#view-home .home-spacer{flex:1 1 auto;min-height:0.5rem;}
+#view-home .notes-strip-section{margin-top:0.875rem;}
 
 /* ---- Status hero: a soft glowing badge that mirrors the live arm state (color set inline via JS from the same MODE_META used everywhere else); no explanatory subtext — the color and icon already say what's needed ---- */
-.status-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;padding:0 0 1.5rem;text-align:center;color:var(--green);}
-.status-hero-icon{position:relative;width:5.25rem;height:5.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.14),rgba(255,255,255,.02));border:1px solid var(--border);box-shadow:0 0 2.75rem -0.5rem currentColor, inset 0 1px 0 rgba(255,255,255,.16);transition:color .3s;}
-.status-hero-icon::after{content:"";position:absolute;inset:-0.4375rem;border-radius:50%;border:1px solid currentColor;opacity:.28;}
-.status-hero-icon svg{width:2.375rem;height:2.375rem;color:currentColor;}
-.status-hero-label{font-size:1.3125rem;font-weight:800;letter-spacing:.2px;color:var(--text);}
+.status-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;padding:0 0 0.875rem;text-align:center;color:var(--green);}
+.status-hero-icon{position:relative;width:4rem;height:4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.14),rgba(255,255,255,.02));border:1px solid var(--border);box-shadow:0 0 2.25rem -0.5rem currentColor, inset 0 1px 0 rgba(255,255,255,.16);transition:color .3s;}
+.status-hero-icon::after{content:"";position:absolute;inset:-0.375rem;border-radius:50%;border:1px solid currentColor;opacity:.28;}
+.status-hero-icon svg{width:1.875rem;height:1.875rem;color:currentColor;}
+.status-hero-label{font-size:1.125rem;font-weight:800;letter-spacing:.2px;color:var(--text);}
 
-/* ---- Home tiles v2: bigger, with a permanent semantic tint per action so the grid reads at a glance even before anything is armed (a more "modern app" cue than the old flat gray icon tiles); label only, no secondary state line ---- */
-.app-tiles-grid{gap:1rem;}
-.app-tiles-grid .tile{min-height:7rem;padding:1.375rem 0.75rem;border-radius:1.125rem;}
-.app-tiles-grid .tile .tile-icon{width:3.5rem;height:3.5rem;border-radius:50%;}
-.app-tiles-grid .tile .tile-icon svg{width:1.625rem;height:1.625rem;}
+/* ---- Home tiles v2: a permanent semantic tint per action so the grid reads at a glance even before anything is armed (a more "modern app" cue than the old flat gray icon tiles); label only, no secondary state line ---- */
+.app-tiles-grid{gap:0.625rem;}
+.app-tiles-grid .tile{min-height:5.25rem;padding:0.875rem 0.75rem;border-radius:1.125rem;}
+.app-tiles-grid .tile .tile-icon{width:2.75rem;height:2.75rem;border-radius:50%;}
+.app-tiles-grid .tile .tile-icon svg{width:1.25rem;height:1.25rem;}
 .app-tiles-grid .tile.dim{opacity:.4;}
-.app-tiles-grid .tile span.label{font-size:0.875rem;font-weight:700;}
+.app-tiles-grid .tile span.label{font-size:0.8125rem;font-weight:700;}
 .app-tiles-grid .tile[data-app-tile="away"] .tile-icon{color:var(--red);background:rgba(251,79,92,.12);}
 .app-tiles-grid .tile[data-app-tile="away"].on .tile-icon{background:rgba(251,79,92,.2);box-shadow:0 0 1rem rgba(251,79,92,.4);}
 .app-tiles-grid .tile[data-app-tile="disarm"] .tile-icon{color:var(--green);background:rgba(52,211,153,.12);}
@@ -934,11 +936,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .app-tiles-grid .tile[data-app-tile="home"].on .tile-icon{background:rgba(245,181,69,.2);box-shadow:0 0 1rem rgba(245,181,69,.4);}
 .app-tiles-grid .tile.panic-tile .tile-icon{background:rgba(251,79,92,.12);}
 
-/* ---- Tab bar v2: icon-only, no text labels, larger glyphs — Home sits inline with the other four, same size, no raised circle ---- */
-.tab-bar .nav-item svg{width:1.5rem;height:1.5rem;}
+/* ---- Tab bar v2: icon-only, no text labels — Home sits inline with the other four, same size, no raised circle. Bar height halved from the original text-label design: tighter padding, no gap for a label row that no longer exists. ---- */
+.tab-bar .nav-item svg{width:1.375rem;height:1.375rem;}
 
 /* ---- Zones FAB: replaces the old header "Learn Mode / Add Device" button with a circular + floating action button, overlaid bottom-right like most apps. position:fixed anchors it to the real screen edge (same technique already used by the toast and modals) rather than to the scrolling zone list, and .view's own opacity/pointer-events already hide it correctly whenever Zones isn't the active tab. ---- */
-.fab{position:fixed;right:1.25rem;bottom:calc(5.25rem + env(safe-area-inset-bottom,0));width:3.5rem;height:3.5rem;padding:0;border:none;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0.5rem 1.25rem -0.25rem rgba(124,140,255,.65), inset 0 1px 0 rgba(255,255,255,.3);z-index:5;transition:transform .15s;}
+.fab{position:fixed;right:1.25rem;bottom:calc(3.75rem + env(safe-area-inset-bottom,0));width:3.5rem;height:3.5rem;padding:0;border:none;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0.5rem 1.25rem -0.25rem rgba(124,140,255,.65), inset 0 1px 0 rgba(255,255,255,.3);z-index:5;transition:transform .15s;}
 .fab svg{width:1.625rem;height:1.625rem;}
 .fab:active{transform:scale(.92);}
 
@@ -1649,7 +1651,7 @@ function paintAppChrome(){
 function renderNotesStrip(){
   const box = document.getElementById("notesStrip");
   if(!box) return;
-  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${truncateNote(n.text,70)}</div>`).join("")
+  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${truncateNote(n.text,50)}</div>`).join("")
     || `<div class="notes-strip-empty">No notes yet — add one from the Notes tab.</div>`;
 }
 document.getElementById("notesStrip").addEventListener("click", ()=>switchView("notes"));
