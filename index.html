@@ -795,8 +795,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .app{flex-direction:column;}
 
 .app-header{
-  height:3.5rem;flex:0 0 auto;display:flex;align-items:center;gap:0.625rem;
-  padding:0 1rem;background:rgba(10,10,12,.4);backdrop-filter:blur(1.25rem) saturate(160%);
+  height:auto;min-height:3.5rem;flex:0 0 auto;display:flex;align-items:center;gap:0.625rem;
+  padding:calc(env(safe-area-inset-top,0) + 0.625rem) 1rem 0.625rem;background:rgba(10,10,12,.4);backdrop-filter:blur(1.25rem) saturate(160%);
   border-bottom:1px solid var(--border);
 }
 .ah-logo{display:flex;align-items:center;gap:0.5rem;flex:0 0 auto;}
@@ -830,15 +830,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .tab-bar .nav-item span{font-size:0.5625rem;font-weight:700;letter-spacing:.2px;}
 .tab-bar .nav-item.active{color:var(--text);background:transparent;box-shadow:none;}
 .tab-bar .nav-item.active::before{content:none;}
-.tab-bar .nav-item.nav-home{
-  flex:0 0 auto;width:3.625rem;height:3.625rem;border-radius:50%;margin:0 0.375rem;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-  box-shadow:0 0.375rem 1rem -0.25rem rgba(124,140,255,.65), inset 0 1px 0 rgba(255,255,255,.3);
-  transform:translateY(-0.75rem);
-}
-.tab-bar .nav-item.nav-home svg{width:1.5rem;height:1.5rem;}
-.tab-bar .nav-item.nav-home span{display:none;}
-.tab-bar .nav-item.nav-home.active{color:#fff;}
 .tab-bar .nav-item.nav-locked{opacity:.3;pointer-events:none;}
 
 /* ---- Home: fixed 2x2 quick-action grid + horizontal notes strip, replacing the kiosk clock/weather hero and the customizable tile row ---- */
@@ -943,9 +934,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 .app-tiles-grid .tile[data-app-tile="home"].on .tile-icon{background:rgba(245,181,69,.2);box-shadow:0 0 1rem rgba(245,181,69,.4);}
 .app-tiles-grid .tile.panic-tile .tile-icon{background:rgba(251,79,92,.12);}
 
-/* ---- Tab bar v2: icon-only, no text labels, larger glyphs ---- */
+/* ---- Tab bar v2: icon-only, no text labels, larger glyphs — Home sits inline with the other four, same size, no raised circle ---- */
 .tab-bar .nav-item svg{width:1.5rem;height:1.5rem;}
-.tab-bar .nav-item.nav-home svg{width:1.75rem;height:1.75rem;}
 
 /* ---- Zones FAB: replaces the old header "Learn Mode / Add Device" button with a circular + floating action button, overlaid bottom-right like most apps. position:fixed anchors it to the real screen edge (same technique already used by the toast and modals) rather than to the scrolling zone list, and .view's own opacity/pointer-events already hide it correctly whenever Zones isn't the active tab. ---- */
 .fab{position:fixed;right:1.25rem;bottom:calc(5.25rem + env(safe-area-inset-bottom,0));width:3.5rem;height:3.5rem;padding:0;border:none;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0.5rem 1.25rem -0.25rem rgba(124,140,255,.65), inset 0 1px 0 rgba(255,255,255,.3);z-index:5;transition:transform .15s;}
@@ -1628,7 +1618,7 @@ function paintAppChrome(){
 function renderNotesStrip(){
   const box = document.getElementById("notesStrip");
   if(!box) return;
-  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${escapeHtml(n.text.slice(0,80))}${n.text.length>80?'…':''}</div>`).join("")
+  box.innerHTML = state.notes.map(n=>`<div class="notes-strip-card" style="background:${n.color}" data-id="${n.id}">${escapeHtml(n.text)}</div>`).join("")
     || `<div class="notes-strip-empty">No notes yet — add one from the Notes tab.</div>`;
 }
 document.getElementById("notesStrip").addEventListener("click", ()=>switchView("notes"));
