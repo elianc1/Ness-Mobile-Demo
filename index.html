@@ -913,6 +913,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
 #view-home .view-header{flex:0 0 auto;margin-bottom:0.5rem;}
 #view-home .notes-strip-section,#view-home .status-hero,#view-home .app-tiles-grid{flex:0 0 auto;}
 #view-home .home-spacer{flex:1 1 auto;min-height:0.5rem;}
+#view-home .home-spacer-2{flex:1 1 auto;min-height:0.5rem;}
 #view-home .notes-strip-section{margin-top:0.875rem;}
 
 /* ---- Status hero: a soft glowing badge that mirrors the live arm state (color set inline via JS from the same MODE_META used everywhere else); no explanatory subtext — the color and icon already say what's needed ---- */
@@ -949,6 +950,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
    which left a strip of .bezel's own black background exposed below the tab bar
    on some iOS devices, especially right after "Add to Home Screen" launch. ---- */
 .bezel{height:var(--app-vh, 100dvh);}
+/* Prefer the browser's own dynamic-viewport unit when it's supported — it
+   tracks the real visible area natively and can't suffer the JS-measurement
+   timing issue above. Invalid property values are ignored by the parser, so
+   on a browser without dvh support this line is simply skipped and the
+   JS-driven rule above still applies. */
+.bezel{height:100dvh;}
 
 /* ---- App header: was translucent enough (rgba(10,10,12,.4) + blur) that the
    Home screen's arm-state color wash bled straight through it, reading as an
@@ -1031,6 +1038,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;heigh
               <div class="status-hero-icon" id="statusHeroIcon"><i data-lucide="shield-check"></i></div>
               <div class="status-hero-label" id="statusHeroLabel">Disarmed</div>
             </div>
+            <div class="home-spacer-2"></div>
 
             <div class="app-tiles-grid" id="appTiles">
               <div class="tile card" data-app-tile="away">
@@ -1385,8 +1393,15 @@ function syncViewportHeight(){
   document.documentElement.style.setProperty("--app-vh", h + "px");
 }
 syncViewportHeight();
+// A standalone home-screen launch on iOS can report an interim (too-small)
+// height on the very first measurement, before the launch transition/status
+// bar settle — a single measurement can silently stick with that short value.
+// Re-measure a few times shortly after load to catch the true final size.
+[50, 150, 300, 600, 1200].forEach(ms => setTimeout(syncViewportHeight, ms));
 window.addEventListener("resize", syncViewportHeight);
 window.addEventListener("orientationchange", ()=>setTimeout(syncViewportHeight, 60));
+window.addEventListener("pageshow", syncViewportHeight);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) syncViewportHeight(); });
 if(window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
 
 /* ============================================================
@@ -1644,7 +1659,7 @@ function paintAppChrome(){
   // live state color: green/disarmed, orange/armed home, red/armed away.
   const homeView = document.getElementById("view-home");
   if(homeView){
-    homeView.style.background = `radial-gradient(ellipse 130% 55% at 50% 0%, ${hexA(color,0.32)}, transparent 60%), radial-gradient(ellipse 150% 70% at 50% 100%, ${hexA(color,0.26)}, transparent 62%), radial-gradient(circle at 50% 45%, ${hexA(color,0.1)}, transparent 70%)`;
+    homeView.style.background = `radial-gradient(ellipse 130% 32% at 50% 2%, ${hexA(color,0.16)}, transparent 55%), radial-gradient(ellipse 150% 70% at 50% 100%, ${hexA(color,0.26)}, transparent 62%), radial-gradient(circle at 50% 45%, ${hexA(color,0.1)}, transparent 70%)`;
   }
   lucide.createIcons();
 }
@@ -1745,7 +1760,14 @@ function paintArmState(){
   // always on: green when disarmed, orange when armed home, red when armed away.
   const screenEl = document.getElementById("screen");
   const glowColor = getComputedColor(meta.color);
-  screenEl.style.boxShadow = `inset 0 0 3.5rem ${hexA(glowColor,0.22)}, inset 0 0 8rem ${hexA(glowColor,0.1)}`;
+  // Biased downward/sideways (positive y-offset on the larger layer) rather than
+  // uniform on all four edges — a symmetric glow read as a hard "shadow" band
+  // right under the header on real devices, since the header sits flush against
+  // the top edge with no room for the glow to fade in gradually. Keeping the
+  // top contribution small and the bottom/side contribution the full intended
+  // strength preserves the "edges glow by arm state" effect without it reading
+  // as a top-bar rendering defect.
+  screenEl.style.boxShadow = `inset 0 2.5rem 4.5rem ${hexA(glowColor,0.2)}, inset 0 0 2rem ${hexA(glowColor,0.1)}`;
 
   // Breathing glow on the security ring's idle icon — a small "system is alive and watching" cue.
   document.getElementById("ringIcon").classList.toggle("breathe", state.armState==="disarmed");
